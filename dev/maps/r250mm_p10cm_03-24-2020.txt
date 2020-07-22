@@ -1,0 +1,14 @@
+Helicalc field map (GPU)
+Helix Parameters (coil, conductor): params/r250mm_p10cm_coil.txt, params/r250mm_p10cm_conductor.txt
+3, 3, 9 (x, y, z) grid
+(81 field points)
+x[mm]	y[mm]	z[mm]	Bx[T]	By[T]	Bz[T]
+nan	-50000.0	-4000.0	1.0	2.0	3.0
+nan	-50000.0	-3000.0	1.0	2.0	3.0
+nan	-50000.0	-2000.0	1.0	2.0	3.0
+nan	-50000.0	-1000.0	1.0	2.0	3.0
+nan	-50000.0	0.0	1.0	2.0	3.0
+nan	-50000.0	1000.0	1.0	2.0	3.0
+nan	-50000.0	2000.0	1.0	2.0	3.0
+nan	-50000.0	3000.0	1.0	2.0	3.0
+nan	-50000.0	4000.0	1.0	2.0	3.0

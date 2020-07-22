@@ -22,3 +22,6 @@ MANIFEST
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
+
+# package specific
+legacy/
