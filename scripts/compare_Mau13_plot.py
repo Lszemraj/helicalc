@@ -9,6 +9,10 @@ plt.rcParams['axes.linewidth'] = 2
 
 # plotdir = '/home/ckampa/data/plots/helicalc/testing/coarse/'
 plotdir = '/home/ckampa/data/plots/helicalc/testing/fine/'
+pkldir = '/home/ckampa/data/pickles/helicalc/testing/'
+# save_name = 'Helicalc_v00_xz_plane.pkl'
+# save_name = 'Helicalc_v00_xz_plane_fine.pkl'
+save_name = 'Helicalc_v00_xz_plane_fine_helicity.pkl'
 
 xs = [-.8, -.4, 0., .4, .8]
 Nx = len(xs)
@@ -17,8 +21,7 @@ Nx = len(xs)
 df_true = pd.read_pickle('/home/shared_data/Bmaps/Mau13/subtracted/Mau13_1.00xDS_0.00xPS-TS_DSMap.p')
 
 # load run results
-# df_run = pd.read_pickle('/home/ckampa/data/pickles/helicalc/testing/Helicalc_v00_xz_plane.pkl')
-df_run = pd.read_pickle('/home/ckampa/data/pickles/helicalc/testing/Helicalc_v00_xz_plane_fine.pkl')
+df_run = pd.read_pickle(pkldir+save_name)
 
 # plot!
 # fig = plt.figure(figsize=(18,16))

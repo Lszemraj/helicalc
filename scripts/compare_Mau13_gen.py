@@ -8,7 +8,8 @@ from tqdm import tqdm
 # output info
 output_dir = '/home/ckampa/data/pickles/helicalc/testing/'
 # save_name = 'Helicalc_v00_xz_plane.pkl'
-save_name = 'Helicalc_v00_xz_plane_fine.pkl'
+# save_name = 'Helicalc_v00_xz_plane_fine.pkl'
+save_name = 'Helicalc_v00_xz_plane_fine_helicity.pkl'
 
 # "truth" (Mau13-(PS+TS)) dataframe
 df_true = pd.read_pickle('/home/shared_data/Bmaps/Mau13/subtracted/Mau13_1.00xDS_0.00xPS-TS_DSMap.p')

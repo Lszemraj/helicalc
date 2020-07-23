@@ -166,6 +166,7 @@ class CoilIntegrator(object):
         self.geom_coil = geom_coil
         self.int_func = int_func
         self.layer = layer
+        self.helicity = geom_coil.helicity * (-1)**(layer-1)
         self.lib = lib
         self.dev = dev
         self.XYZ_rot = geom_coil[[f'rot{i:d}' for i in [0,1,2]]].values
@@ -195,7 +196,7 @@ class CoilIntegrator(object):
         x0, y0, z0 = self.mu2e_to_coil.apply(np.array([x0-self.xc, y0-self.yc, z0-self.zc]))
         # calculate repeated calculations
         RX = rx(self.RHO, self.COSPHI, x0)
-        RY = ry(self.RHO, self.SINPHI, self.geom_coil.helicity, y0)
+        RY = ry(self.RHO, self.SINPHI, self.helicity, y0)
         RZ = rz(self.ZETA, self.PHI, self.geom_coil.pitch_bar, self.geom_coil.L, z0)
         R2_32 = (RX**2+RY**2+RZ**2)**(3/2)
         result = []
