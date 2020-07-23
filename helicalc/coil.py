@@ -203,7 +203,7 @@ class CoilIntegrator(object):
         # int_func must have params (x, y, z, x0, y0, z0)
         for integrand_func in [helix_integrand_Bx, helix_integrand_By, helix_integrand_Bz]:
             integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.RHO, self.COSPHI,
-                                                                   self.SINPHI, self.geom_coil.helicity,
+                                                                   self.SINPHI, self.helicity,
                                                                    self.geom_coil.pitch_bar, self.geom_coil.L)
             result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func).item())
         B_vec = np.array(result)

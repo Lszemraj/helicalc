@@ -8,7 +8,8 @@ config_plots()
 plt.rcParams['axes.linewidth'] = 2
 
 # plotdir = '/home/ckampa/data/plots/helicalc/testing/coarse/'
-plotdir = '/home/ckampa/data/plots/helicalc/testing/fine/'
+# plotdir = '/home/ckampa/data/plots/helicalc/testing/fine/'
+plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity/'
 pkldir = '/home/ckampa/data/pickles/helicalc/testing/'
 # save_name = 'Helicalc_v00_xz_plane.pkl'
 # save_name = 'Helicalc_v00_xz_plane_fine.pkl'
