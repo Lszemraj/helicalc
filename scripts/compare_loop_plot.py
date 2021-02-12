@@ -1,27 +1,64 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
+# from mpl_toolkits.mplot3d import Axes3D
+# import matplotlib.gridspec as gridspec
 from helicalc.tools import config_plots
 
 config_plots()
-plt.rcParams['axes.linewidth'] = 2
+# plt.rcParams['axes.linewidth'] = 2
 
-# plotdir = '/home/ckampa/data/plots/helicalc/testing/coarse/'
-# plotdir = '/home/ckampa/data/plots/helicalc/testing/fine/'
-# plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity/'
-# plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_noadj/'
-# plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_noadj_helical_only/'
-plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_helical_only/'
+plotdir = '/home/ckampa/data/plots/helicalc/testing/loop_current/'
 
 pkldir = '/home/ckampa/data/pickles/helicalc/testing/'
-# save_name = 'Helicalc_v00_xz_plane.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj_32bit.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj.pkl'
-save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+save_name = 'Loop_Current_Test.pkl'
 
+df = pd.read_pickle(pkldir+save_name)
+# remove large radius
+R = 0.9
+df = df.query(f'X > -{R} & X <= {R}').copy()
+
+def make_pcolormesh(df, x='Z', y='X', scale=1e4, c='dB_SOL_BR', c_label=r'$\Delta B$ [Gauss] (Opera SOL - Opera BR20)', title='Opera "Solenoid" vs. Opera "Brick", Y==0 [m]'):
+    # sort values and reshape
+    lx = len(df[x].unique())
+    ly = len(df[y].unique())
+    df_ = df.sort_values(by=[x, y])
+    X = df_[x].values.reshape(lx, ly)
+    Y = df_[y].values.reshape(lx, ly)
+    C = scale*df_[c].values.reshape(lx, ly)
+
+    fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    pc = plt.pcolormesh(X, Y, C, shading='nearest')
+    cb = plt.colorbar(pc)
+    cb.set_label(c_label)
+    plt.xlabel(x + ' [m]')
+    plt.ylabel(y + ' [m]')
+    plt.title(title)
+    fig.get_axes()[0].set_aspect('auto')
+    fig.savefig(plotdir+c+'_pcolormesh.pdf')
+    fig.savefig(plotdir+c+'_pcolormesh.png')
+
+for i in ['', 'x','y','z']:
+    cs = [f'dB{i}_SOL_BR', f'dB{i}_HEL_SOL', f'dB{i}_HEL_BR']
+    if i != '':
+        c_labels = [rf'$\Delta B_{i}$ [Gauss] (Opera SOL - Opera BR20)', rf'$\Delta B_{i}$ [Gauss] (Helicalc - Opera SOL)', rf'$\Delta B_{i}$ [Gauss] (Helicalc - Opera BR20)']
+    else:
+        c_labels = [rf'$\Delta B$ [Gauss] (Opera SOL - Opera BR20)', rf'$\Delta B$ [Gauss] (Helicalc - Opera SOL)', rf'$\Delta B$ [Gauss] (Helicalc - Opera BR20)']
+    titles = ['Opera "Solenoid" vs. Opera "Brick", Y==0 [m]', 'Helicalc vs. Opera "Solenoid", Y==0 [m]', 'Helicalc vs. Opera "Brick", Y==0 [m]']
+
+    for c, cl, t in zip(cs, c_labels, titles):
+        make_pcolormesh(df=df, c=c, c_label=cl, title=t)
+
+
+# cs = ['dB_SOL_BR', 'dB_HEL_SOL', 'dB_HEL_BR']
+# c_labels = [r'$\Delta B$ [Gauss] (Opera SOL - Opera BR20)$', r'$\Delta B$ [Gauss] (Helicalc - Opera SOL)', r'$\Delta B$ [Gauss] (Helicalc - Opera BR20)']
+# titles = ['Opera "Solenoid" vs. Opera "Brick", Y==0 [m]', 'Helicalc vs. Opera "Solenoid", Y==0 [m]', 'Helicalc vs. Opera "Brick", Y==0 [m]']
+
+# for c, cl, t in zip(cs, c_labels, titles):
+#     make_pcolormesh(df=df, c=c, c_label=cl, title=t)
+
+"""
 # xs = [0.]
 xs = [-.8, -.4, 0., .4, .8]
 Nx = len(xs)
@@ -144,3 +181,4 @@ for x in xs:
         fig.savefig(name+'.pdf')
         fig.savefig(name+'.png')
 '''
+"""

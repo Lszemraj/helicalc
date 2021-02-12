@@ -124,13 +124,45 @@ class CoilIntegrator(object):
         rho1 = rho0 + geom_coil.h_sc
         # rho_lims = [geom_coil.rho0_a, geom_coil.rho1_a]
         rho_lims = [rho0, rho1]
+        # helicity
+        self.helicity = int(geom_coil.helicity * (-1)**(layer-1))
+        # phi lims
+        if layer == geom_coil.N_layers:
+            # in last layer, wind until phi1 reached
+            if geom_coil.phi1 < geom_coil.phi0:
+                self.last_turn_rad = 2*np.pi - geom_coil.phi0 + geom_coil.phi1
+            elif geom_coil.phi1 > geom_coil.phi0:
+                self.last_turn_rad = geom_coil.phi1 - geom_coil.phi0
+            else:
+                self.last_turn_rad = 2*np.pi
+            if self.helicity == 1:
+                self.phi_i = geom_coil.phi0
+                self.phi_f = geom_coil.phi0 + 2*np.pi*(geom_coil.N_turns-1) + self.last_turn_rad
+            else:
+                self.phi_i = geom_coil.phi0 + (2*np.pi - self.last_turn_rad)
+                self.phi_f = geom_coil.phi0 + 2*np.pi*geom_coil.N_turns
+        else:
+            self.phi_i = geom_coil.phi0
+            self.phi_f = geom_coil.phi0 + 2*np.pi*geom_coil.N_turns
         zeta_lims = [geom_coil.zeta0, geom_coil.zeta1]
-        phi_lims = [geom_coil.phi_i, geom_coil.phi_f]
+        # phi_lims = [geom_coil.phi_i, geom_coil.phi_f]
+        phi_lims = [self.phi_i, self.phi_f]
         xyz_lims = [rho_lims, zeta_lims, phi_lims]
+        # try 64-bit
+        # does not improve
+        # self.rhos = lib.linspace(xyz_lims[0][0], xyz_lims[0][1], abs(int((xyz_lims[0][1]-xyz_lims[0][0])/dxyz[0] + 1))).cuda().type('torch.DoubleTensor')
+        # self.zetas = lib.linspace(xyz_lims[1][0], xyz_lims[1][1], abs(int((xyz_lims[1][1]-xyz_lims[1][0])/dxyz[1] + 1))).cuda().type('torch.DoubleTensor')
+        # self.phis = lib.linspace(xyz_lims[2][0], xyz_lims[2][1], abs(int((xyz_lims[2][1]-xyz_lims[2][0])/dxyz[2] + 1))).cuda().type('torch.DoubleTensor')
+        # 32-bit default
+        ### TRY USING ARANGE INSTEAD OF LINSPACE (GET CORRECT ENDPOINTS)
+        ### NO^^ (linspace does it correctly)
+        # self.rhos = lib.arange(xyz_lims[0][0], xyz_lims[0][1], abs(int((xyz_lims[0][1]-xyz_lims[0][0])/dxyz[0] + 1))).cuda()
+        # self.zetas = lib.linspace(xyz_lims[1][0], xyz_lims[1][1], abs(int((xyz_lims[1][1]-xyz_lims[1][0])/dxyz[1] + 1))).cuda()
+        # self.phis = lib.linspace(xyz_lims[2][0], xyz_lims[2][1], abs(int((xyz_lims[2][1]-xyz_lims[2][0])/dxyz[2] + 1))).cuda()
         self.rhos = lib.linspace(xyz_lims[0][0], xyz_lims[0][1], abs(int((xyz_lims[0][1]-xyz_lims[0][0])/dxyz[0] + 1))).cuda()
         self.zetas = lib.linspace(xyz_lims[1][0], xyz_lims[1][1], abs(int((xyz_lims[1][1]-xyz_lims[1][0])/dxyz[1] + 1))).cuda()
         self.phis = lib.linspace(xyz_lims[2][0], xyz_lims[2][1], abs(int((xyz_lims[2][1]-xyz_lims[2][0])/dxyz[2] + 1))).cuda()
-        # estimate memory
+        # # estimate memory
         per_el_rh = 1.1e-5
         per_el_z = 2.27e-5
         per_el_ph = 4e-6
@@ -166,7 +198,6 @@ class CoilIntegrator(object):
         self.geom_coil = geom_coil
         self.int_func = int_func
         self.layer = layer
-        self.helicity = geom_coil.helicity * (-1)**(layer-1)
         self.lib = lib
         self.dev = dev
         self.XYZ_rot = geom_coil[[f'rot{i:d}' for i in [0,1,2]]].values
@@ -197,7 +228,8 @@ class CoilIntegrator(object):
         # calculate repeated calculations
         RX = rx(self.RHO, self.COSPHI, x0)
         RY = ry(self.RHO, self.SINPHI, self.helicity, y0)
-        RZ = rz(self.ZETA, self.PHI, self.geom_coil.pitch_bar, self.geom_coil.L, z0)
+        RZ = rz(self.ZETA, self.PHI, self.geom_coil.phi0, self.geom_coil.pitch_bar, self.geom_coil.L, self.geom_coil.t_gi, z0)
+        # print(RZ)
         R2_32 = (RX**2+RY**2+RZ**2)**(3/2)
         result = []
         # int_func must have params (x, y, z, x0, y0, z0)

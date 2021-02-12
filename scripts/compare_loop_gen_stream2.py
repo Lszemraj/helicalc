@@ -7,35 +7,69 @@ from tqdm import tqdm
 
 # output info
 output_dir = '/home/ckampa/data/pickles/helicalc/testing/'
-# save_name = 'Helicalc_v00_xz_plane.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj_32bit.pkl'
-# save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj.pkl'
-## coil only map
-save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+save_name = 'Loop_Current_Test_Stream2.pkl'
 
-# "truth" (Mau13-(PS+TS)) dataframe
-# df_true = pd.read_pickle('/home/shared_data/Bmaps/Mau13/subtracted/Mau13_1.00xDS_0.00xPS-TS_DSMap.p')
-df_true = pd.read_pickle('/home/ckampa/data/Bmaps/Mau13/DSMap_helical_windings_only.p')
-# create grid of test points
-## QUICK
-# xs = [0.]
-# ys = [0.]
-# zs = df_true.Z.unique()[::200]
-#######
-xs = [-0.8, -0.4, 0., 0.4, 0.8]
-ys = [0.]
-zs = df_true.Z.unique()[::25]
-X, Y, Z = np.meshgrid(xs,ys,zs,indexing='ij')
+x0 = 1.06055
+lx2 = 0.005
+Nx = 21
+z0 = 0
+lz2 = 0.002
+Nz = 9
+y0 = 0
+
+xs = np.linspace(x0-lx2, x0+lx2, Nx)
+zs = np.linspace(z0-lz2, z0+lz2, Nz)
+
+X, Z = np.meshgrid(xs, zs)
 X = X.flatten()
-Y = Y.flatten()
 Z = Z.flatten()
+
+df = pd.DataFrame({'X':X, 'Z':Z})
+df['Y'] = y0
 
 # load Mau13 coils
 # geom_df = read_solenoid_geom_combined('../dev/params/', 'DS_V13_adjusted')
-geom_df = read_solenoid_geom_combined('../dev/params/', 'DS_V13')
+geom_df = read_solenoid_geom_combined('/home/ckampa/coding/helicalc/dev/params/', 'current_loop')
+geom_df['z'] = -0.0002
+geom_df['pitch_bar'] = 0 # pitch is zero for a ring
+geom_coil = geom_df.iloc[0]
 
+# CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([1e-3, 1e-3, 1e-3/geom_coil.Ri]), layer=1)
+CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([5e-4, 5e-4, 1e-4/geom_coil.Ri]), layer=1)
+B_calcs = []
+for row in tqdm(df.itertuples(), total=len(df)):
+    B_calcs.append(CoilIG.integrate(row.X, row.Y, row.Z))
+
+B_calcs = np.array(B_calcs)
+df['Bx_calc'] = B_calcs[:,0]
+df['By_calc'] = B_calcs[:,1]
+df['Bz_calc'] = B_calcs[:,2]
+
+# calculate |B|
+# df.eval('B = (Bx**2 + By**2 + Bz**2)**(1/2)', inplace=True)
+# df.eval('B_br = (Bx_br**2 + By_br**2 + Bz_br**2)**(1/2)', inplace=True)
+df.eval('B_calc = (Bx_calc**2 + By_calc**2 + Bz_calc**2)**(1/2)', inplace=True)
+# calculate residuals
+# "dBx_BR_SOL" means Bx_br - Bx_sol, for example
+# SOL - BR
+# df.eval('dBx_SOL_BR = Bx - Bx_br', inplace=True)
+# df.eval('dBy_SOL_BR = By - By_br', inplace=True)
+# df.eval('dBz_SOL_BR = Bz - Bz_br', inplace=True)
+# df.eval('dB_SOL_BR = B - B_br', inplace=True)
+# # HEL - SOL
+# df.eval('dBx_HEL_SOL = Bx_calc - Bx', inplace=True)
+# df.eval('dBy_HEL_SOL = By_calc - By', inplace=True)
+# df.eval('dBz_HEL_SOL = Bz_calc - Bz', inplace=True)
+# df.eval('dB_HEL_SOL = B_calc - B', inplace=True)
+# # HEL - BR
+# df.eval('dBx_HEL_BR = Bx_calc - Bx_br', inplace=True)
+# df.eval('dBy_HEL_BR = By_calc - By_br', inplace=True)
+# df.eval('dBz_HEL_BR = Bz_calc - Bz_br', inplace=True)
+# df.eval('dB_HEL_BR = B_calc - B_br', inplace=True)
+
+df.to_pickle(output_dir+save_name)
+
+'''
 def Mu2e_DS_B(x=0., y=0., z=10.571):
     x -= 3.904
     Bs = []
@@ -72,3 +106,4 @@ if __name__ == '__main__':
     df_run.eval('dB = B-B_Mau13', inplace=True)
 
     df_run.to_pickle(output_dir+save_name)
+'''
