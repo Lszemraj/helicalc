@@ -2,8 +2,13 @@ import numpy as np
 import torch as tc
 
 # main integrator
+# 3D needed for helicalc
 def trapz_3d(xs, ys, zs, integrand_xyz, int_func=tc.trapz):
     return int_func(int_func(int_func(integrand_xyz, axis=-1, x=zs), axis=-1, x=ys), axis=-1, x=xs)
+
+# 2D needed for solcalc. Cylindrical integration
+def trapz_2d(rs, zs, integrand_rz, int_func=tc.trapz):
+    return int_func(int_func(integrand_rz, axis=-1, x=zs), axis=-1, x=rs)
 
 # helpful functions
 # maybe move into CoilIntegrator class? FIXME!

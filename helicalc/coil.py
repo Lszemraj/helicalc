@@ -116,6 +116,9 @@ class CoilIntegrator(object):
     def __init__(self, geom_coil, dxyz, layer=1, int_func=tc.trapz, lib=tc, dev=0):
         if layer > geom_coil.N_layers:
             raise ValueError(f'Layer "{layer}" invalid. Please select layer in the range [1, {int(geom_coil.N_layers)}]')
+        # set correct device
+        tc.cuda.set_device(dev)
+        # check device initial memory
         self.start_dev_mem = get_gpu_memory_map()[dev]
         self.mem_err_expected = False
         # x, y, z --> rho, zeta, phi
