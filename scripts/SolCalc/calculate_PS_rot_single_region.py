@@ -22,13 +22,13 @@ paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 
 # rotate coldmass
 # 16mrad
-# paramname = 'Mu2e_PS_coldmass_rot_16mrad'
-# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
-# base_coils = 'PS_coldmass_16mrad'
+paramname = 'Mu2e_PS_coldmass_rot_16mrad'
+datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
+base_coils = 'PS_coldmass_16mrad'
 # 16mrad
-paramname = 'Mu2e_PS_coldmass_rot_23mrad'
-datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
-base_coils = 'PS_coldmass_23mrad'
+# paramname = 'Mu2e_PS_coldmass_rot_23mrad'
+# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
+# base_coils = 'PS_coldmass_23mrad'
 
 regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid}
 

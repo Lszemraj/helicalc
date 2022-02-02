@@ -9,8 +9,8 @@ conda activate helicalc
 # run PS
 python calculate_Mau13_single_region.py -r TSu -t n
 # run PS
-python calculate_Mau13_single_region.py -r TSd -t n
+# python calculate_Mau13_single_region.py -r TSd -t n
 # run PS
-python calculate_Mau13_single_region.py -r DS -t n
+# python calculate_Mau13_single_region.py -r DS -t n
 
 # read -p "Press any key to resume ..."
