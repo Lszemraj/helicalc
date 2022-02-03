@@ -28,3 +28,8 @@ TSd_grid = {'X0':-5.096, 'Y0':-1.200, 'Z0':-0.829,
 DS_grid = {'X0':-5.096, 'Y0':-1.200, 'Z0':3.071,
            'nX':97, 'nY':97, 'nZ':521,
            'dX':0.025, 'dY':0.025, 'dZ':0.025}
+# additions outside solenoid regions
+# note that for now we do not do "flipy", so should include Y<0 in grid
+PStoDumpArea_grid = {'X0':0.004, 'Y0':-5.500, 'Z0':-14.929,
+                     'nX':73, 'nY':111, 'nZ':51,
+                     'dX':0.100, 'dY':0.100, 'dZ':0.100}

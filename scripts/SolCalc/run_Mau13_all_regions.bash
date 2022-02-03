@@ -6,11 +6,13 @@ conda activate helicalc
 
 # run PS -- done
 # python calculate_Mau13_single_region.py -r PS -t n
-# run PS
-python calculate_Mau13_single_region.py -r TSu -t n
-# run PS
+# run TSu
+# python calculate_Mau13_single_region.py -r TSu -t n
+# run TSd
 # python calculate_Mau13_single_region.py -r TSd -t n
-# run PS
+# run DS
 # python calculate_Mau13_single_region.py -r DS -t n
+# run PStoDumpArea
+python calculate_Mau13_single_region.py -r PStoDumpArea -t n
 
 # read -p "Press any key to resume ..."

@@ -6,20 +6,27 @@ import numpy as np
 from helicalc.solcalc import *
 from helicalc.geometry import read_solenoid_geom_combined
 from helicalc.tools import generate_cartesian_grid_df
-from helicalc.constants import PS_grid, TSu_grid, TSd_grid, DS_grid
+from helicalc.constants import (
+    PS_grid,
+    TSu_grid,
+    TSd_grid,
+    DS_grid,
+    PStoDumpArea_grid
+)
 
 paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 paramname = 'Mu2e_V13'
 datadir = '/home/shared_data/Bmaps/SolCalc_partial/'
 
-regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid}
+regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,
+           'PStoDumpArea': PStoDumpArea_grid}
 
 if __name__=='__main__':
     # parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--Region',
                         help='Which region of Mu2e to calculate? '+
-                        '["PS"(default), "TSu", "TSd", "DS"]')
+                        '["PS"(default), "TSu", "TSd", "DS", "PStoDumpArea"]')
     parser.add_argument('-t', '--Testing',
                         help='Calculate using small subset of coils?'+
                         '"y"(default)/"n"')

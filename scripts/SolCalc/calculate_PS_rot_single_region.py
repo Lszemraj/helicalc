@@ -6,7 +6,13 @@ import numpy as np
 from helicalc.solcalc import *
 from helicalc.geometry import read_solenoid_geom_combined
 from helicalc.tools import generate_cartesian_grid_df
-from helicalc.constants import PS_grid, TSu_grid, TSd_grid, DS_grid
+from helicalc.constants import (
+    PS_grid,
+    TSu_grid,
+    TSd_grid,
+    DS_grid,
+    PStoDumpArea_grid
+)
 
 paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 # old version
@@ -22,22 +28,23 @@ paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 
 # rotate coldmass
 # 16mrad
-paramname = 'Mu2e_PS_coldmass_rot_16mrad'
-datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
-base_coils = 'PS_coldmass_16mrad'
-# 16mrad
-# paramname = 'Mu2e_PS_coldmass_rot_23mrad'
-# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
-# base_coils = 'PS_coldmass_23mrad'
+# paramname = 'Mu2e_PS_coldmass_rot_16mrad'
+# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
+# base_coils = 'PS_coldmass_16mrad'
+# 23mrad
+paramname = 'Mu2e_PS_coldmass_rot_23mrad'
+datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
+base_coils = 'PS_coldmass_23mrad'
 
-regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid}
+regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,
+           'PStoDumpArea': PStoDumpArea_grid}
 
 if __name__=='__main__':
     # parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--Region',
                         help='Which region of Mu2e to calculate? '+
-                        '["PS"(default), "TSu", "TSd", "DS"]')
+                        '["PS"(default), "TSu", "TSd", "DS", "PStoDumpArea"]')
     parser.add_argument('-c', '--Coils',
                         help='Which coils to calculate? '+
                         '["1,2,3" (default), "1,2", "1,3", "2,3", 1", "2", "3"]')
