@@ -13,6 +13,8 @@ conda activate helicalc
 # run DS
 # python calculate_Mau13_single_region.py -r DS -t n
 # run PStoDumpArea
-python calculate_Mau13_single_region.py -r PStoDumpArea -t n
+# python calculate_Mau13_single_region.py -r PStoDumpArea -t n
+# run ProtonDumpArea
+python calculate_Mau13_single_region.py -r ProtonDumpArea -t n
 
 # read -p "Press any key to resume ..."

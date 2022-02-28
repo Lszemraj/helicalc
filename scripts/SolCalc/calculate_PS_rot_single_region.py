@@ -11,7 +11,8 @@ from helicalc.constants import (
     TSu_grid,
     TSd_grid,
     DS_grid,
-    PStoDumpArea_grid
+    PStoDumpArea_grid,
+    ProtonDumpArea_grid
 )
 
 paramdir = '/home/ckampa/coding/helicalc/dev/params/'
@@ -32,19 +33,25 @@ paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 # datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
 # base_coils = 'PS_coldmass_16mrad'
 # 23mrad
-paramname = 'Mu2e_PS_coldmass_rot_23mrad'
-datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
-base_coils = 'PS_coldmass_23mrad'
+# paramname = 'Mu2e_PS_coldmass_rot_23mrad'
+# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
+# base_coils = 'PS_coldmass_23mrad'
+# 7mrad
+paramname = 'Mu2e_PS_coldmass_rot_7mrad'
+datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_7mrad/'
+base_coils = 'PS_coldmass_7mrad'
 
 regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,
-           'PStoDumpArea': PStoDumpArea_grid}
+           'PStoDumpArea': PStoDumpArea_grid,
+           'ProtonDumpArea': ProtonDumpArea_grid}
 
 if __name__=='__main__':
     # parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--Region',
                         help='Which region of Mu2e to calculate? '+
-                        '["PS"(default), "TSu", "TSd", "DS", "PStoDumpArea"]')
+                        '["PS"(default), "TSu", "TSd", "DS", "PStoDumpArea"'+
+                        ', "ProtonDumpArea"]')
     parser.add_argument('-c', '--Coils',
                         help='Which coils to calculate? '+
                         '["1,2,3" (default), "1,2", "1,3", "2,3", 1", "2", "3"]')
