@@ -37,16 +37,24 @@ def read_solenoid_geom_combined(params_dir, geom_name, sep=',', skiprows=1):
     df['mu_fac'] = mu_0 * df.j / (4*np.pi)
 
     df['pitch'] = df.w_cable + 2.*df.t_ci # BAD--Hank says good. Helical parameters. Would need adjustment if desired pitch is larger than laying cables on top of one another
-    df['pitch_2'] = (df.L - df.w_cable - 2.*df.t_ci) / df.N_turns
+    # df['pitch_2'] = (df.L - df.w_cable - 2.*df.t_ci) / df.N_turns
+    df['pitch_2'] = (df.L - df.w_cable - 2.*df.t_gi) / df.N_turns
     # df['pitch'] = df.L / df.N_turns
-    df['pitch_bar'] = df['pitch'] / (2*np.pi)
-    # df['pitch_bar'] = df['pitch_2'] / (2*np.pi)
+    # df['pitch_bar'] = df['pitch'] / (2*np.pi)
+    df['pitch_bar'] = df['pitch_2'] / (2*np.pi)
 
     # integration limits
     # df['phi_i']
-    df['N_turns_true'] = df['L'] / df['pitch']
-    df['phi_i'] = 0.
-    df['phi_f'] = 2*np.pi*df.N_turns_true
+    # df['N_turns_true'] = df['L'] / df['pitch']
+    # df['phi_i'] = 0.
+    # df['phi_f'] = 2*np.pi*df.N_turns_true
+    # df['phi_i'] = df['phi0']
+
+    # phi0 and phi1 to radians
+    df['phi0_deg'] = df['phi0']
+    df['phi1_deg'] = df['phi1']
+    df['phi0'] = np.radians(df['phi0_deg'])
+    df['phi1'] = np.radians(df['phi1_deg'])
 
     #return Coils, Conductor
     return df
