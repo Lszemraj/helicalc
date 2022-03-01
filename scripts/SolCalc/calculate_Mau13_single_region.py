@@ -3,6 +3,7 @@ from time import time
 from datetime import datetime
 import argparse
 import numpy as np
+from helicalc import helicalc_dir, helicalc_data
 from helicalc.solcalc import *
 from helicalc.geometry import read_solenoid_geom_combined
 from helicalc.tools import generate_cartesian_grid_df
@@ -15,9 +16,10 @@ from helicalc.constants import (
     ProtonDumpArea_grid
 )
 
-paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+# paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+paramdir = helicalc_dir + 'dev/params/'
 paramname = 'Mu2e_V13'
-datadir = '/home/shared_data/Bmaps/SolCalc_partial/'
+datadir = helicalc_data+'Bmaps/SolCalc_partial/'
 
 regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,
            'PStoDumpArea': PStoDumpArea_grid,

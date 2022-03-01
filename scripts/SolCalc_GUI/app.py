@@ -10,6 +10,7 @@ import dash_table
 from dash_table.Format import Format, Scheme
 
 # SolCalc
+from helicalc import helicalc_dir, helicalc_data
 from helicalc.solcalc import SolCalcIntegrator
 from helicalc.geometry import read_solenoid_geom_combined
 
@@ -19,7 +20,8 @@ from cylinders import get_thick_cylinders_padded
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # load nominal PS geom
-paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+# paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+paramdir = helicalc_dir + 'dev/params/'
 paramfile = 'Mu2e_V13'
 
 df_PS_nom = read_solenoid_geom_combined(paramdir, paramfile).iloc[:3]
@@ -39,7 +41,8 @@ cols_stat = ['Coil_Num', 'Ro', 'L', 'I_tot', 'N_turns_tot', 'helicity', 'h_cable
 
 
 # load TS+DS contribution to PS
-PSoff_file = '/home/shared_data/Bmaps/SolCalc_complete/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
+#PSoff_file = '/home/shared_data/Bmaps/SolCalc_complete/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
+PSoff_file = helicalc_data+'Bmaps/aux/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
 df_PSoff = pd.read_pickle(PSoff_file)
 df_PSoff = df_PSoff.astype(np.float)
 # m = (df_PSoff.Y == 0.) & (np.isin(df_PSoff.X - 3.904, [0., 0.4, 0.7]))

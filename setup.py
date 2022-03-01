@@ -18,4 +18,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     include_package_data=True,
-    zip_safe=False,)
+    zip_safe=False,
+    scripts=['scripts/cfgs.py']
+)
