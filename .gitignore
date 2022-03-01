@@ -27,4 +27,5 @@ MANIFEST
 legacy/
 # symlink for output data, and needs
 # "PSoff" dataframe for SolCalc_GUI
+# data
 data
