@@ -281,6 +281,8 @@ def calculate_field(df):
      Input('field-unit', 'value')],
 )
 def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
+    # save original unit
+    unit_ = unit
     #print(df)
     df = pd.read_json(df)
     #print(df)
@@ -303,7 +305,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
         t_inc = ''
         if ytype == 'grad_z(B_i)':
             ycol = f'grad_z({ycol})'
-            unit = unit+'/m'
+            unit_print = unit_+'/m'
             t_inc = ' Gradient'
             for m_ in ms:
                 B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -328,7 +330,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
             t_inc = ''
             if ytype == 'grad_z(B_i)':
                 ycol_ = f'grad_z({ycol})'
-                unit = unit+'/m'
+                unit_print = unit_+'/m'
                 t_inc = ' Gradient'
                 for m_ in ms:
                     B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -349,7 +351,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
             t_inc = ''
             if ytype == 'grad_z(B_i)':
                 ycol_ = f'grad_z({ycol})'
-                unit = unit+'/m'
+                unit_print = unit_+'/m'
                 t_inc = ' Gradient'
                 for m_ in ms:
                     B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -374,7 +376,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
                    #yaxis={'title': f'{ycol} [{unit}]', 'tickfont':{'size': fsize_ticks}},
         ),
         xaxis={'title': 'Z [m]', 'tickfont':{'size': fsize_ticks}},
-        yaxis={'title': f'{ycol} [{unit}]', 'tickfont':{'size': fsize_ticks}},
+        yaxis={'title': f'{ycol} [{unit_print}]', 'tickfont':{'size': fsize_ticks}},
         plot_bgcolor=plot_bg,
         showlegend=True,
     )
