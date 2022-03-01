@@ -145,4 +145,4 @@ Dash is running on http://127.0.0.1:8050/
  * Debug mode: on
 ...
 ```
-Point a web browser to `localhost:8050`, replacing `8050` with whichever port the server is running on.
+Point a web browser to `localhost:8050`, replacing `8050` with whichever port the server is running on. 
