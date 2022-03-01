@@ -10,16 +10,16 @@ import dash_table
 from dash_table.Format import Format, Scheme
 
 # SolCalc
+from helicalc import helicalc_dir, helicalc_data
 from helicalc.solcalc import SolCalcIntegrator
 from helicalc.geometry import read_solenoid_geom_combined
-
-# in this directory
-from cylinders import get_thick_cylinders_padded
+from helicalc.cylinders import get_thick_cylinders_padded
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # load nominal PS geom
-paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+# paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+paramdir = helicalc_dir + 'dev/params/'
 paramfile = 'Mu2e_V13'
 
 df_PS_nom = read_solenoid_geom_combined(paramdir, paramfile).iloc[:3]
@@ -39,9 +39,10 @@ cols_stat = ['Coil_Num', 'Ro', 'L', 'I_tot', 'N_turns_tot', 'helicity', 'h_cable
 
 
 # load TS+DS contribution to PS
-PSoff_file = '/home/shared_data/Bmaps/SolCalc_complete/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
+#PSoff_file = '/home/shared_data/Bmaps/SolCalc_complete/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
+PSoff_file = helicalc_data+'Bmaps/aux/Mau13.SolCalc.PS_region.standard.PSoff.pkl'
 df_PSoff = pd.read_pickle(PSoff_file)
-df_PSoff = df_PSoff.astype(np.float)
+df_PSoff = df_PSoff.astype(float)
 # m = (df_PSoff.Y == 0.) & (np.isin(df_PSoff.X - 3.904, [0., 0.4, 0.7]))
 m = (df_PSoff.Y == 0.) & (np.isin(df_PSoff.X, [3.904, 4.304, 4.604]))
 df_PSoff_lines = df_PSoff[m].copy().reset_index(drop=True, inplace=False)
@@ -158,10 +159,10 @@ app.layout = html.Div([
 )
 def update_geom_data(n_clicks, rows_stat, cols_stat, rows_edit, cols_edit):
     # load data
-    df_edit = pd.DataFrame(rows_edit, columns=[c['name'] for c in cols_edit], dtype=np.float)
+    df_edit = pd.DataFrame(rows_edit, columns=[c['name'] for c in cols_edit], dtype=float)
     print(df_edit)
     print(df_edit.info())
-    df_stat = pd.DataFrame(rows_stat, columns=[c['name'] for c in cols_stat], dtype=np.float)
+    df_stat = pd.DataFrame(rows_stat, columns=[c['name'] for c in cols_stat], dtype=float)
     # calculations
     df_stat.loc[:, 'Ro'] = df_edit.Ri + df_stat.h_cable * df_edit.N_layers + \
     2 * df_stat.t_gi + 2*df_stat.t_ci*df_edit.N_layers +\
@@ -280,6 +281,9 @@ def calculate_field(df):
      Input('field-unit', 'value')],
 )
 def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
+    # save original unit
+    unit_ = unit
+    unit_print = unit
     #print(df)
     df = pd.read_json(df)
     #print(df)
@@ -294,7 +298,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
     ms = [m1, m2, m3]
     # plotting depends most heavily on whether plotting individual coils
     if plotIndiv == 'combined':
-        B = df[ycol].values.astype(np.float)
+        B = df[ycol].values.astype(float)
         if incTS == 'yes':
             B += df_PSoff_lines[ycol].values
         if unit == 'Tesla':
@@ -302,7 +306,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
         t_inc = ''
         if ytype == 'grad_z(B_i)':
             ycol = f'grad_z({ycol})'
-            unit = unit+'/m'
+            unit_print = unit_+'/m'
             t_inc = ' Gradient'
             for m_ in ms:
                 B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -321,13 +325,13 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
         ycols_TS = ['']
         for yc, cs in zip(ycols_PS, cs_list):
             yc_full = ycol+f'_solcalc_{yc}'
-            B = df[yc_full].values.astype(np.float)
+            B = df[yc_full].values.astype(float)
             if unit == 'Tesla':
                 B *= 1e-4
             t_inc = ''
             if ytype == 'grad_z(B_i)':
                 ycol_ = f'grad_z({ycol})'
-                unit = unit+'/m'
+                unit_print = unit_+'/m'
                 t_inc = ' Gradient'
                 for m_ in ms:
                     B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -342,13 +346,13 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
                     name=f'R = {r:0.2f}, Coil {yc}'))
         # make another trace for TS if necessary
         if incTS == 'yes':
-            B = df_PSoff_lines[ycol].values.astype(np.float)
+            B = df_PSoff_lines[ycol].values.astype(float)
             if unit == 'Tesla':
                 B *= 1e-4
             t_inc = ''
             if ytype == 'grad_z(B_i)':
                 ycol_ = f'grad_z({ycol})'
-                unit = unit+'/m'
+                unit_print = unit_+'/m'
                 t_inc = ' Gradient'
                 for m_ in ms:
                     B[m_] = np.concatenate([[np.nan],np.diff(B[m_]) / np.diff(zs[m_])])
@@ -373,7 +377,7 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
                    #yaxis={'title': f'{ycol} [{unit}]', 'tickfont':{'size': fsize_ticks}},
         ),
         xaxis={'title': 'Z [m]', 'tickfont':{'size': fsize_ticks}},
-        yaxis={'title': f'{ycol} [{unit}]', 'tickfont':{'size': fsize_ticks}},
+        yaxis={'title': f'{ycol} [{unit_print}]', 'tickfont':{'size': fsize_ticks}},
         plot_bgcolor=plot_bg,
         showlegend=True,
     )
@@ -382,4 +386,4 @@ def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host='127.0.0.1')

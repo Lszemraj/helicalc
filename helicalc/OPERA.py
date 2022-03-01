@@ -2,9 +2,10 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation
+from helicalc import helicalc_dir
 
 class Bricks(object):
-    def __init__(self, filedir='/home/ckampa/coding/helicalc/legacy/OPERA/', filename='DS8_helix_V13.cond'):
+    def __init__(self, filedir=helicalc_dir+'dev/params/OPERA/', filename='DS8_helix_V13.cond'):
         self.filedir = filedir
         self.filename = filename
         if filename[:2] == 'DS':

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run SolCalc for the different magnet regions
 
-source /home/ckampa/anaconda3/etc/profile.d/conda.sh
+source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate helicalc
 
 # run PS -- done

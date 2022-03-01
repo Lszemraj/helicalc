@@ -3,6 +3,7 @@ from time import time
 from datetime import datetime
 import argparse
 import numpy as np
+from helicalc import helicalc_dir, helicalc_data
 from helicalc.solcalc import *
 from helicalc.geometry import read_solenoid_geom_combined
 from helicalc.tools import generate_cartesian_grid_df
@@ -15,7 +16,8 @@ from helicalc.constants import (
     ProtonDumpArea_grid
 )
 
-paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+# paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+paramdir = helicalc_dir + 'dev/params/'
 # old version
 #paramname = 'Mu2e_PS3_rot_16mrad'
 #paramname = 'Mu2e_PS23_rot_16mrad'
@@ -24,21 +26,21 @@ paramdir = '/home/ckampa/coding/helicalc/dev/params/'
 
 # individual rotations
 # paramname = 'Mu2e_PS123_rot_16mrad'
-# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS3_rot_16mrad/'
+# datadir = helicalc_data+'Bmaps/SolCalc_partial/PS3_rot_16mrad/'
 # base_coils = 'PS3_16mrad'
 
 # rotate coldmass
 # 16mrad
 # paramname = 'Mu2e_PS_coldmass_rot_16mrad'
-# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
+# datadir = helicalc_data+'Bmaps/SolCalc_partial/PS_coldmass_rot_16mrad/'
 # base_coils = 'PS_coldmass_16mrad'
 # 23mrad
 # paramname = 'Mu2e_PS_coldmass_rot_23mrad'
-# datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
+# datadir = helicalc_data+'Bmaps/SolCalc_partial/PS_coldmass_rot_23mrad/'
 # base_coils = 'PS_coldmass_23mrad'
 # 7mrad
 paramname = 'Mu2e_PS_coldmass_rot_7mrad'
-datadir = '/home/shared_data/Bmaps/SolCalc_partial/PS_coldmass_rot_7mrad/'
+datadir = helicalc_data+'Bmaps/SolCalc_partial/PS_coldmass_rot_7mrad/'
 base_coils = 'PS_coldmass_7mrad'
 
 regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,

@@ -38,7 +38,7 @@ def Br_Bz_integrands(r, z, a, j):
         Br = prefac * z/r * (-K + (a**2 + r**2 + z**2)/denom * E)
     Bz = prefac * (K + (a**2 - r**2 - z**2)/denom * E)
     return Br, Bz
-    
+
 def Br_Bz_integrands_vec(r, z, a, j):
     # shared elements
     cutoff = 1e-5
@@ -55,7 +55,7 @@ def Br_Bz_integrands_vec(r, z, a, j):
     Bz = prefac * (K + (a**2 - r**2 - z**2)/denom * E)
     return Br, Bz
 
-    
+
 # main integrator class
 class SolCalcIntegrator(object):
     def __init__(self, geom_coil, drz, use_basic_geom=True, layer=1, int_func=np.trapz, lib=np, dev=3):
@@ -102,7 +102,7 @@ class SolCalcIntegrator(object):
         else:
             self.rs = np.linspace(rz_lims[0][0], rz_lims[0][1], abs(int((rz_lims[0][1]-rz_lims[0][0])/drz[0] + 1)))
             self.zs = np.linspace(rz_lims[1][0], rz_lims[1][1], abs(int((rz_lims[1][1]-rz_lims[1][0])/drz[1] + 1)))
-        # estimate memory / limit of number of field points to calulate at once 
+        # estimate memory / limit of number of field points to calulate at once
         # FIXME!
         # set R, Z grid
         # only once ellipe & ellipk in torch
@@ -143,7 +143,7 @@ class SolCalcIntegrator(object):
             for o in [self.rs, self.zs, self.R, self.Z]:
                 sizes.append(o.nbytes*1e-6)
         self.getsizeof_init_mb = np.array(sizes)
-        
+
     def integrate_single(self, x0=0, y0=0, z0=0, debug=False):
         # append to lists
         self.x_calcs.append(x0)
@@ -183,7 +183,7 @@ class SolCalcIntegrator(object):
         self.By_calcs.append(B_vec_rot[1])
         self.Bz_calcs.append(B_vec_rot[2])
         return B_vec_rot
-    
+
     def integrate_vec(self, x0=np.array([0]), y0=np.array([0]), z0=np.array([0]), debug=False):
         # append to lists
         self.x_calcs.append(x0)
@@ -225,7 +225,7 @@ class SolCalcIntegrator(object):
         self.By_calcs.append(B_vec_rot[1])
         self.Bz_calcs.append(B_vec_rot[2])
         return B_vec_rot
-    
+
     def integrate_grid(self, df, N_proc=None, OPTIMAL=None, tqdm=tqdm, verbose=False):
         # initial time
         t0 = time()
@@ -279,13 +279,13 @@ class SolCalcIntegrator(object):
         self.df.loc[:, f'Bx_solcalc_{i}'] = Bxs
         self.df.loc[:, f'By_solcalc_{i}'] = Bys
         self.df.loc[:, f'Bz_solcalc_{i}'] = Bzs
-        
+
         # final time, report total time
         tf = time()
         print(f'Calculation time: {(tf - t0):0.2f} s\n')
-        
+
         return self.df
-    
+
     def save_grid_calc(self, savetype='pkl', savename='data/Mau13.PS_region.standard.coil0', all_solcalc_cols=False):
         # determine which columns to save
         i = int(round(self.geom_coil.Coil_Num))
@@ -303,8 +303,8 @@ class SolCalcIntegrator(object):
             df_to_save.to_pickle(f'{savename}.{savetype}')
         else:
             raise NotImplementedError('Allowed savetype: ["pkl"]')
-  
-# see if this works outside class defn.         
+
+# see if this works outside class defn.
 def integrate_grid(SolCalc, df, N_proc=None, OPTIMAL=None, tqdm=tqdm, verbose=False):
     i = round(SolCalc.geom_coil.Coil_Num)
     print(f'Coil {i}: grid with {len(df):E} points')
@@ -361,12 +361,13 @@ def integrate_grid(SolCalc, df, N_proc=None, OPTIMAL=None, tqdm=tqdm, verbose=Fa
 
 
 if __name__=='__main__':
+    from helicalc import helicalc_dir
     from helicalc.geometry import read_solenoid_geom_combined
-    geom_df_mu2e = read_solenoid_geom_combined('../dev/params/','Mu2e_V13')
+    geom_df_mu2e = read_solenoid_geom_combined(helicalc_dir+'dev/params/','Mu2e_V13')
     i = 0 # 1st coil in the PS
     #i = 5 # coil in the TS
     # testing grid
-    df_PS = pd.read_pickle('/home/ckampa/coding/mu2e_utils/BField_plot/data/PSMap_no-offset.pkl')
+    # df_PS = pd.read_pickle('/home/ckampa/coding/mu2e_utils/BField_plot/data/PSMap_no-offset.pkl')
     # step size
     drz = np.array([5e-3, 1e-2])
     # set up integrator

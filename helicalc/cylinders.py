@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 import plotly.graph_objects as go
 
+from helicalc import helicalc_dir
 from helicalc.geometry import read_solenoid_geom_combined
 
 def cylinder(r, h, xc=0, yc=0, zc=0, pitch=0., yaw=0., roll=0., nt=100, nv=50, flip_angles=False):
@@ -91,7 +92,8 @@ def get_thick_cylinders_padded(df, coil_nums):
 
 if __name__=='__main__':
     # load geometry
-    paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+    # paramdir = '/home/ckampa/coding/helicalc/dev/params/'
+    paramdir = helicalc_dir+'dev/params/'
     paramfile = 'Mu2e_V13'
     df_PS_nom = read_solenoid_geom_combined(paramdir, paramfile).iloc[:3]
     # test get thick cylinder
