@@ -283,6 +283,7 @@ def calculate_field(df):
 def field_plot(df, ycol, ytype, incTS, plotIndiv, unit):
     # save original unit
     unit_ = unit
+    unit_print = unit
     #print(df)
     df = pd.read_json(df)
     #print(df)
