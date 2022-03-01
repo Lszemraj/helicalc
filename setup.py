@@ -37,10 +37,10 @@ setuptools.setup(
     python_requires='>=3.6',
     include_package_data=True,
     zip_safe=False,
-    # cmdclass={
-    #     'develop': PostDevelopCommand,
-    #     'install': PostInstallCommand,
-    # },
+    cmdclass={
+        'develop': PostDevelopCommand,
+        'install': PostInstallCommand,
+    },
     scripts=['scripts/SolCalc_GUI/SolCalcGUI.py']
 )
 
