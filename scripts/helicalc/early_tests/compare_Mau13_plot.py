@@ -12,7 +12,8 @@ plt.rcParams['axes.linewidth'] = 2
 # plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity/'
 # plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_noadj/'
 # plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_noadj_helical_only/'
-plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_helical_only/'
+#plotdir = '/home/ckampa/data/plots/helicalc/testing/fine_helicity_helical_only/'
+plotdir = '/home/ckampa/data/plots/helicalc/testing/coarse_helicity_helical_only_03-14-22/'
 
 pkldir = '/home/ckampa/data/pickles/helicalc/testing/'
 # save_name = 'Helicalc_v00_xz_plane.pkl'
@@ -20,7 +21,8 @@ pkldir = '/home/ckampa/data/pickles/helicalc/testing/'
 # save_name = 'Helicalc_v00_xz_plane_fine_helicity.pkl'
 # save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj_32bit.pkl'
 # save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj.pkl'
-save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+#save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+save_name = 'Helicalc_v01_xz_plane_coarse_helicity_helonly.pkl'
 
 # xs = [0.]
 xs = [-.8, -.4, 0., .4, .8]

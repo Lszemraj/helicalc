@@ -40,8 +40,8 @@ def read_solenoid_geom_combined(params_dir, geom_name, sep=',', skiprows=1):
     # df['pitch_2'] = (df.L - df.w_cable - 2.*df.t_ci) / df.N_turns
     df['pitch_2'] = (df.L - df.w_cable - 2.*df.t_gi) / df.N_turns
     # df['pitch'] = df.L / df.N_turns
-    # df['pitch_bar'] = df['pitch'] / (2*np.pi)
-    df['pitch_bar'] = df['pitch_2'] / (2*np.pi)
+    df['pitch_bar'] = df['pitch'] / (2*np.pi) # follows OPERA
+    # df['pitch_bar'] = df['pitch_2'] / (2*np.pi)
 
     # integration limits
     # df['phi_i']
@@ -55,6 +55,13 @@ def read_solenoid_geom_combined(params_dir, geom_name, sep=',', skiprows=1):
     df['phi1_deg'] = df['phi1']
     df['phi0'] = np.radians(df['phi0_deg'])
     df['phi1'] = np.radians(df['phi1_deg'])
+
+    # useful things for helicalc -- DS coils
+    # Number of turns * Ri (integer) -- used to determine number of field points to calculate at once
+    df['Nt_Ri'] = (df.N_turns * df.Ri).astype(int)
+    # which dxyz to use (default to 1 for multilayer, 2 for single layer)
+    # can overrride where necessary
+    df['dxyz'] = np.where(df['N_layers'] > 1, 1, 2)
 
     #return Coils, Conductor
     return df

@@ -38,3 +38,12 @@ PStoDumpArea_grid = {'X0':0.004, 'Y0':-5.500, 'Z0':-14.929,
 ProtonDumpArea_grid = {'X0':-0.796, 'Y0':-5.600, 'Z0':-20.929,
                        'nX':20, 'nY':57, 'nZ':31,
                        'dX':0.200, 'dY':0.200, 'dZ':0.200}
+
+# dxyz for helicalc (nominal values for Mu2e DS coils)
+# radius is hard coded for now.
+# coarse integration grid (3x3 in cross section, 1/(5cm) in R*phi)
+dxyz_dict_coarse = {1: np.array([3e-3,1e-3, 5e-2/1.05]),
+                    2: np.array([2e-3,1e-3, 5e-2/1.05])}
+# fine integration grid (3x3 in cross section, 1/(1cm) in R*phi)
+dxyz_dict = {1: np.array([3e-3,1e-3, 1e-2/1.05]),
+             2: np.array([2e-3,1e-3, 1e-2/1.05])}

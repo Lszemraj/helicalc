@@ -45,8 +45,8 @@ class Bricks(object):
         for i, zips in enumerate(zip(self.pos0s, np.radians(self.phi2s))):
             xyz, phi2 = zips
             # CHECK ANGLE SIGN
-            rot = Rotation.from_euler('Z',-phi2)
-            # rot = Rotation.from_euler('Z',phi2)
+            # rot = Rotation.from_euler('Z',-phi2)
+            rot = Rotation.from_euler('Z',phi2)
             xyz_rot = rot.apply(xyz)
             xyz_rot[:,0] += self.xcen1s[i] + self.xcen2s[i]
             xyz_rot[:,1] += self.ycen1s[i] + self.ycen2s[i]

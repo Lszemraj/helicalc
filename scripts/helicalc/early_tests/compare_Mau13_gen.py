@@ -13,7 +13,8 @@ output_dir = '/home/ckampa/data/pickles/helicalc/testing/'
 # save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj_32bit.pkl'
 # save_name = 'Helicalc_v00_xz_plane_fine_helicity_noadj.pkl'
 ## coil only map
-save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+#save_name = 'Helicalc_v00_xz_plane_fine_helicity_helonly.pkl'
+save_name = 'Helicalc_v01_xz_plane_coarse_helicity_helonly.pkl'
 
 # "truth" (Mau13-(PS+TS)) dataframe
 # df_true = pd.read_pickle('/home/shared_data/Bmaps/Mau13/subtracted/Mau13_1.00xDS_0.00xPS-TS_DSMap.p')
@@ -34,8 +35,9 @@ Z = Z.flatten()
 
 # load Mau13 coils
 # geom_df = read_solenoid_geom_combined('../dev/params/', 'DS_V13_adjusted')
-geom_df = read_solenoid_geom_combined('../dev/params/', 'DS_V13')
+geom_df = read_solenoid_geom_combined('../../dev/params/', 'DS_V13')
 
+# would be much faster to loop through field points first, then coils
 def Mu2e_DS_B(x=0., y=0., z=10.571):
     x -= 3.904
     Bs = []
@@ -43,8 +45,12 @@ def Mu2e_DS_B(x=0., y=0., z=10.571):
     for i in range(len(geom_df)):
         geom_coil = geom_df.iloc[i]
         for j in range(1, int(geom_coil.N_layers+1)):
+            # coarse
             # CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([2e-3,2e-3, 2e-3/geom_coil.Ri]), layer=j)
-            CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([1e-3,1e-3, 1e-3/geom_coil.Ri]), layer=j)
+            # fine
+            #CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([1e-3,1e-3, 1e-3/geom_coil.Ri]), layer=j, dev=3)
+            # coarse (3-14-22)
+            CoilIG = CoilIntegrator(geom_coil, dxyz=np.array([2e-3,1e-3, 5e-3/geom_coil.Ri]), layer=j, dev=3)
             Bs.append(CoilIG.integrate(x0=x, y0=y, z0=z))
             names.append(f'Coil_{geom_coil.Coil_Num}_Layer_{j}')
     Bs = np.array(Bs)
