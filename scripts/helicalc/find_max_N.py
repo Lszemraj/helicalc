@@ -56,38 +56,46 @@ if __name__=='__main__':
         args.Append = args.Append.strip() == 'y'
     # run until return code is 1
     rcode = 0
-    # coarse scan up
-    N = 10
+    # coarse scan up, steps of 1000
+    N = 100
     while(rcode==0):
         compproc = subprocess.run(f'python check_mem.py -C {args.Coil}'+
                                   f' -L {args.Layer} -N {N} -dxyz {args.dxyz}'+
                                   f' -D {args.Device}', shell=True,
                                   capture_output=False)
         rcode = compproc.returncode
-        N += 10
-    # fine scan down
+        N += 100
+    # fine scan down, steps of 500
     while(rcode==1):
-        N -= 5
+        N -= 50
         compproc = subprocess.run(f'python check_mem.py -C {args.Coil}'+
                                   f' -L {args.Layer} -N {N} -dxyz {args.dxyz}'+
                                   f' -D {args.Device}', shell=True,
                                   capture_output=False)
         rcode = compproc.returncode
-    # finer scan up
+    # finer scan up, steps of 100
     while(rcode==0):
-        N += 1
+        N += 10
+        compproc = subprocess.run(f'python check_mem.py -C {args.Coil}'+
+                                  f' -L {args.Layer} -N {N} -dxyz {args.dxyz}'+
+                                  f' -D {args.Device}', shell=True,
+                                  capture_output=False)
+        rcode = compproc.returncode
+    # finest scan down, steps of 10
+    while(rcode==1):
+        N -= 1
         compproc = subprocess.run(f'python check_mem.py -C {args.Coil}'+
                                   f' -L {args.Layer} -N {N} -dxyz {args.dxyz}'+
                                   f' -D {args.Device}', shell=True,
                                   capture_output=False)
         rcode = compproc.returncode
     # final N is out of range, so N max - 1
-    N -= 1
+    # N -= 1
     df_coil = geom_df_mu2e.query(f'Coil_Num=={args.Coil}').iloc[0]
     #Nt_Ri = f'{df_coil.N_turns * df_coil.Ri:d}'
     Nt_Ri = int(df_coil.N_turns * df_coil.Ri)
     print(f'N_turns * Ri = {Nt_Ri}')
-    print(f'Maximum N: {N}, or number of field points = {N*100}')
+    print(f'Maximum N: {N}, or number of field points = {N*10}')
     # write to file
     if args.File is not None:
         args.File = args.File.strip()
@@ -96,10 +104,11 @@ if __name__=='__main__':
             headerline = ''
         else:
             oflag = 'w'
-            headerline = 'N_turns * Ri, N_field_points\n'
+            #headerline = 'N_turns * Ri, N_field_points\n'
+            headerline = 'Nt_Ri,N_field_points\n'
         with open(helicalc_data+args.File, oflag) as ofile:
             ofile.write(headerline)
-            ofile.write(f'{Nt_Ri}, {N*100}\n')
+            ofile.write(f'{Nt_Ri},{N*10}\n')
     # # test -- can we get the value from the other script?
     # i = subprocess.run('python check_mem.py -C 56 -L 1 -N 1 -dxyz 1 -D 0',
     #                    shell=True, capture_output=True)

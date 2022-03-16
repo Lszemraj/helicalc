@@ -1,7 +1,12 @@
 from sys import getsizeof
+from time import time
 import numpy as np
 import torch as tc
 from scipy.spatial.transform import Rotation
+from tqdm import tqdm
+#import multiprocessing
+#from joblib import Parallel, delayed
+from helicalc import helicalc_data
 from .integrate import *
 from .constants import *
 from .tools import *
@@ -35,7 +40,7 @@ class CoilIntegrator(object):
             if interlayer_connect:
                 if self.helicity < 0:
                     # connect brick at phi_i
-                    self.phi_i = self.phi_i + np.radians(36.)
+                    self.phi_i = self.phi_i - np.radians(36.)
                 else:
                     # connect brick at phi_f
                     self.phi_f = self.phi_f - np.radians(36.)
@@ -271,3 +276,80 @@ class CoilIntegrator(object):
         # VERY SLOW! CAUTION!
         #self.actual_mem_run_mb = get_gpu_memory_map()[self.dev] - self.start_dev_mem
         return self.last_result
+
+    #def integrate_grid(self, df, N_batch=100, tqdm=tqdm, verbose=False):
+    def integrate_grid(self, df, N_batch=100, tqdm=tqdm):
+        # initial time
+        t0 = time()
+        i = int(round(self.geom_coil.Coil_Num))
+        print(f'Coil {i}: grid with {len(df):E} points')
+        # add dataframe to object
+        self.df = df.copy() # passed in dataframe with columns X, Y, Z [m]
+        # calculate number of chunks
+        N_per_chunk = N_batch
+        N_chunks = int(len(df)/N_per_chunk) + 1
+        # let user know chunk size
+        print(f'Chunk size: {N_per_chunk}, Number of chunks: {N_chunks}')
+        # generate padded arrays corresponding to chunk size and number of chunks
+        vals_list = []
+        for col in ['X', 'Y', 'Z']:
+            vals = np.zeros(N_per_chunk * N_chunks)
+            vals[:len(self.df)] = self.df[col]
+            vals = vals.reshape((N_chunks, N_per_chunk))
+            vals_list.append(vals)
+        # loop through chunks and save results
+        Bxs = []
+        Bys = []
+        Bzs = []
+        for x_, y_, z_ in tqdm(zip(*vals_list), desc='Chunk #', total=len(vals_list[0])):
+            Bx_, By_, Bz_ = self.integrate_vec_v2(x_, y_, z_)
+            Bxs.append(Bx_)
+            Bys.append(By_)
+            Bzs.append(Bz_)
+        # parallel calculations
+        # calculate chunks
+        #output_tuples = Parallel(n_jobs=1)\
+        #(delayed(self.integrate_vec_v2)(x_, y_, z_) for x_, y_, z_ in tqdm(zip(*vals_list), desc='Chunk #', total=len(vals_list[0])))
+        # sort and store results
+        # Bxs = []
+        # Bys = []
+        # Bzs = []
+        # for t in output_tuples:
+        #     Bxs.append(t[0])
+        #     Bys.append(t[1])
+        #     Bzs.append(t[2])
+
+        Bxs = np.array(Bxs).flatten()[:len(self.df)]
+        Bys = np.array(Bys).flatten()[:len(self.df)]
+        Bzs = np.array(Bzs).flatten()[:len(self.df)]
+        xs = vals_list[0].flatten()[:len(self.df)]
+        ys = vals_list[1].flatten()[:len(self.df)]
+        zs = vals_list[2].flatten()[:len(self.df)]
+
+        self.df.loc[:, f'Bx_helicalc_c{i}_l{self.layer}'] = Bxs
+        self.df.loc[:, f'By_helicalc_c{i}_l{self.layer}'] = Bys
+        self.df.loc[:, f'Bz_helicalc_c{i}_l{self.layer}'] = Bzs
+
+        # final time, report total time
+        tf = time()
+        print(f'Calculation time: {(tf - t0):0.2f} s\n')
+
+        return self.df
+
+    def save_grid_calc(self, savetype='pkl', savename='Bmaps/helicalc_partial/Mau13.DS_region.standard-helicalc.coil56', all_helicalc_cols=False):
+        # determine which columns to save
+        i = int(round(self.geom_coil.Coil_Num))
+        cols = ['X', 'Y', 'Z']
+        for col in self.df.columns:
+            if all_helicalc_cols:
+                if 'helicalc' in col:
+                    cols.append(col)
+            else:
+                if f'helicalc_c{i}_l{self.layer}' in col:
+                    cols.append(col)
+        # save
+        df_to_save = self.df[cols]
+        if savetype == 'pkl':
+            df_to_save.to_pickle(f'{helicalc_data}{savename}.{savetype}')
+        else:
+            raise NotImplementedError('Allowed savetype: ["pkl"]')

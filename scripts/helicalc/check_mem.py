@@ -20,7 +20,7 @@ if __name__=='__main__':
     parser.add_argument('-L', '--Layer',
                         help='Coil layer [1 (default), 2,...]. Do not enter layer number > total number of layers in that coil.')
     parser.add_argument('-N', '--Number',
-                        help='Number of field points (in hundreds), default is 1=100.')
+                        help='Number of field points (in hundreds), default is 10=100.')
     parser.add_argument('-dxyz', '--dxyz',
                         help='Which formula to use for step size: [1 (default), 2]. 1 is for multilayer DS coils, 2 is for single layser DS coils.')
     parser.add_argument('-D', '--Device',
@@ -42,7 +42,7 @@ if __name__=='__main__':
     if args.Number is None:
         N = 100
     else:
-        N = 100 * int(args.Number.strip())
+        N = 10 * int(args.Number.strip())
     # load N test points
     df = generate_cartesian_grid_df(DS_grid).iloc[:N]
     if args.dxyz is None:
