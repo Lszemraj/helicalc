@@ -28,7 +28,7 @@ if __name__=='__main__':
     if args.Testing is None:
         args.Testing = 'n'
     else:
-        args.Testing = 'y'
+        args.Testing = args.Testing.strip()
         reg = 'DS'
     Test = args.Testing
 
