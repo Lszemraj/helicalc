@@ -38,3 +38,26 @@ PStoDumpArea_grid = {'X0':0.004, 'Y0':-5.500, 'Z0':-14.929,
 ProtonDumpArea_grid = {'X0':-0.796, 'Y0':-5.600, 'Z0':-20.929,
                        'nX':20, 'nY':57, 'nZ':31,
                        'dX':0.200, 'dY':0.200, 'dZ':0.200}
+
+# dxyz for helicalc (nominal values for Mu2e DS coils)
+# radius is hard coded for now.
+# coarse integration grid (3x3 in cross section, 1/(5cm) in R*phi)
+dxyz_dict_coarse = {1: np.array([3e-3,1e-3, 5e-2/1.05]),
+                    2: np.array([2e-3,1e-3, 5e-2/1.05])}
+# fine integration grid (3x3 in cross section, 1/(1cm) in R*phi)
+dxyz_dict = {1: np.array([3e-3,1e-3, 1e-2/1.05]),
+             2: np.array([2e-3,1e-3, 1e-2/1.05])}
+
+# dictionary for which coils & layers on which GPU (for full run)
+# key is device, value is a list of dictionaries with coil + layer
+helicalc_GPU_dict = {0: [{'coil': 56, 'layer': 1, 'name': 'DS-1'}, {'coil': 56, 'layer': 2, 'name': 'DS-1'},
+                         {'coil': 60, 'layer': 1, 'name': 'DS-5'}, {'coil': 63, 'layer': 1, 'name': 'DS-8'}],
+                     1: [{'coil': 57, 'layer': 1, 'name': 'DS-2'}, {'coil': 57, 'layer': 2, 'name': 'DS-2'},
+                         {'coil': 60, 'layer': 2, 'name': 'DS-5'}, {'coil': 64, 'layer': 1, 'name': 'DS-9'}],
+                     2: [{'coil': 58, 'layer': 1, 'name': 'DS-3'}, {'coil': 58, 'layer': 2, 'name': 'DS-3'},
+                         {'coil': 61, 'layer': 1, 'name': 'DS-6'}, {'coil': 65, 'layer': 1, 'name': 'DS-10'}],
+                     3: [{'coil': 59, 'layer': 1, 'name': 'DS-4'}, {'coil': 59, 'layer': 2, 'name': 'DS-4'},
+                         {'coil': 61, 'layer': 2, 'name': 'DS-6'},
+                         {'coil': 62, 'layer': 1, 'name': 'DS-7'}, {'coil': 62, 'layer': 2, 'name': 'DS-7'},
+                         {'coil': 66, 'layer': 1, 'name': 'DS-11'}, {'coil': 66, 'layer': 2, 'name': 'DS-11'},],
+                    }
