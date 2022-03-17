@@ -29,8 +29,9 @@ if __name__=='__main__':
         args.Testing = 'n'
     else:
         args.Testing = args.Testing.strip()
-        reg = 'DS'
     Test = args.Testing
+    # if Test == 'y':
+    #     reg = 'DS'
 
     print(f'Running on GPU: {Dev}')
     for info in helicalc_GPU_dict[Dev]:

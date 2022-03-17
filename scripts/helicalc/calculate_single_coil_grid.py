@@ -67,10 +67,10 @@ if __name__=='__main__':
         args.Testing = False
     else:
         args.Testing = args.Testing.strip() == 'y'
-        reg = 'DS'
     # set up base directory/name
     if args.Testing:
-        base_name = f'Bmaps/helicalc_partial/tests/Mau13.DS_region.test-helicalc.'
+        #reg = 'DS'
+        base_name = f'Bmaps/helicalc_partial/tests/Mau13.{reg}_region.test-helicalc.'
     else:
         base_name = f'Bmaps/helicalc_partial/Mau13.{reg}_region.standard-helicalc.'
     # print configs
