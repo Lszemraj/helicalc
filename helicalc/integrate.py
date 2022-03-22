@@ -68,7 +68,7 @@ def helix_integrand_Bz_min(RX, RY, RZ, R2_32, HRHOCOSPHI, HRHOSINPHI, pitch_bar)
 
 ####
 
-## CIRCLE
+## CIRCULAR ARC BAR
 def rx_circ(rho, COSPHI, x):
     return x - rho*COSPHI
 def ry_circ(rho, SINPHI, y):
@@ -84,3 +84,17 @@ def circle_integrand_By(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, 
 def circle_integrand_Bz(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
     return (-rho * SINPHI * RY - rho * COSPHI * RX) / R2_32
 
+####
+
+## STRAIGHT BAR
+def rx_str(x0, xp):
+    return x0 - xp
+def ry_str(y0, yp):
+    return y0 - yp
+def rz_str(z0, zp):
+    return z0 - zp
+
+def straight_integrand_Bx(RX, RY, R2_32):
+    return -RY/R2_32
+def straight_integrand_By(RX, RY, R2_32):
+    return RX/R2_32
