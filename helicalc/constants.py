@@ -39,6 +39,8 @@ ProtonDumpArea_grid = {'X0':-0.796, 'Y0':-5.600, 'Z0':-20.929,
                        'nX':20, 'nY':57, 'nZ':31,
                        'dX':0.200, 'dY':0.200, 'dZ':0.200}
 
+# integrator specific constants
+## HELICALC / COILS
 # dxyz for helicalc (nominal values for Mu2e DS coils)
 # radius is hard coded for now.
 # coarse integration grid (3x3 in cross section, 1/(5cm) in R*phi)
@@ -61,3 +63,8 @@ helicalc_GPU_dict = {0: [{'coil': 56, 'layer': 1, 'name': 'DS-1'}, {'coil': 56, 
                          {'coil': 62, 'layer': 1, 'name': 'DS-7'}, {'coil': 62, 'layer': 2, 'name': 'DS-7'},
                          {'coil': 66, 'layer': 1, 'name': 'DS-11'}, {'coil': 66, 'layer': 2, 'name': 'DS-11'},],
                     }
+## STRAIGHT BAR
+# dxyz for straight bars (nominal values for Mu2e bars)
+# fine integration grid (3x3 in cross section, 1/(0.5cm) in length)
+dxyz_straight_bar_dict = {1: np.array([1e-3,3e-3, 5e-3]),
+                          2: np.array([1e-3,2e-3, 5e-3])}
