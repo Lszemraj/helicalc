@@ -194,6 +194,7 @@ class ArcIntegrator3D(object):
             self.rho = geom_df.R_curve # different setup for transfer line arcs
         else:
             self.rho = geom_df.R0 # does not work for last 4 arcs (to transfer line)
+        self.geom_df = geom_df
         self.I = geom_df.I
         self.W = geom_df.W
         self.T = geom_df['T']
@@ -254,8 +255,8 @@ class ArcIntegrator3D(object):
             y0_vec = tc.from_numpy(y0_vec).cuda()
             z0_vec = tc.from_numpy(z0_vec).cuda()
         RX = rx_arc(x0_vec[:,None,None,None], self.XP[None,...])
-        RY = ry_arc(y0_vec[:,None,None,None], self.YP[None,...])
-        RZ = rz_arc(z0_vec[:,None,None,None], self.ZP[None,...])
+        RY = ry_arc(y0_vec[:,None,None,None], self.rho, self.RHOP[None,...], self.COSPHI[None,...])
+        RZ = rz_arc(z0_vec[:,None,None,None], self.RHOP[None,...], self.SINPHI[None,...])
         R2_32 = (RX**2 + RY**2 + RZ**2)**(3/2)
         result = []
         for integrand_func in [arc_integrand_Bx, arc_integrand_By, arc_integrand_Bz]:
