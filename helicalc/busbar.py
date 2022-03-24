@@ -58,7 +58,10 @@ class StraightIntegrator3D(object):
         self.inv_rot = self.rot.inv()
 
     def integrate(self, x0, y0, z0):
-        x0, y0, z0 = self.rot.apply(np.array([x0-self.xc, y0-self.yc, z0-self.zc]))
+        # attempt 1
+        ###x0, y0, z0 = self.rot.apply(np.array([x0-self.xc, y0-self.yc, z0-self.zc]))
+        # attempt 2
+        x0, y0, z0 = self.inv_rot.apply(np.array([x0-self.xc, y0-self.yc, z0-self.zc]))
         RX = rx_str(x0, self.XP)
         RY = ry_str(y0, self.YP)
         RZ = rz_str(z0, self.ZP)
@@ -69,13 +72,19 @@ class StraightIntegrator3D(object):
             result.append(trapz_3d(self.xps, self.yps, self.zps, integrand_xyz, self.int_func).item())
         B_vec = np.array(result+[0.])
         # rotate vector back to mu2e coordinates
-        B_vec_rot = self.inv_rot.apply(B_vec)
+        # attempt 1
+        ###B_vec_rot = self.inv_rot.apply(B_vec)
+        # attempt 2
+        B_vec_rot = self.rot.apply(B_vec)
         self.last_result_norot = B_vec
         self.last_result = B_vec_rot
         return self.last_result
 
     def integrate_vec(self, x0_vec, y0_vec, z0_vec):
-        x0_vec, y0_vec, z0_vec = self.rot.apply(np.array([x0_vec-self.xc, y0_vec-self.yc, z0_vec-self.zc]).T).T
+        # attempt 1
+        # x0_vec, y0_vec, z0_vec = self.rot.apply(np.array([x0_vec-self.xc, y0_vec-self.yc, z0_vec-self.zc]).T).T
+        # attempt 2
+        x0_vec, y0_vec, z0_vec = self.inv_rot.apply(np.array([x0_vec-self.xc, y0_vec-self.yc, z0_vec-self.zc]).T).T
         if self.lib is tc:
             x0_vec = tc.from_numpy(x0_vec).cuda()
             y0_vec = tc.from_numpy(y0_vec).cuda()
@@ -93,7 +102,10 @@ class StraightIntegrator3D(object):
         else:
             B_vecs = np.array(result+[np.zeros_like(x0_vec)])
         # rotate vector back to mu2e coordinates
-        B_vecs_rot = self.inv_rot.apply(B_vecs.T).T
+        # attempt 1
+        # B_vecs_rot = self.inv_rot.apply(B_vecs.T).T
+        # attempt 2
+        B_vecs_rot = self.rot.apply(B_vecs.T).T
         self.last_result_norot = B_vecs
         self.last_result = B_vecs_rot
         return self.last_result
