@@ -201,7 +201,7 @@ class ArcIntegrator3D(object):
         self.j = self.I / (self.W*self.T)
         self.mu_fac = mu_0 * self.j / (4*np.pi)
         self.phi0 = 0.
-        self.phif = geom_df.dphi
+        self.phif = np.radians(geom_df.dphi)
         self.dxyz = dxyz
         # local origin
         self.xc = geom_df.x0
