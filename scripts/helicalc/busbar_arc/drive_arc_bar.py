@@ -5,7 +5,9 @@ from helicalc.constants import dxyz_arc_bar_dict, TSd_grid, DS_grid
 from helicalc.solenoid_geom_funcs import load_all_geoms
 
 # load straight bus bars, dump all other geometries
-_, _, df_arc, df_arc_transfer = load_all_geoms(return_dict=False)
+df_dict = load_all_geoms(return_dict=True)
+df_arc = df_dict['arcs']
+df_arc_transfer = df_dict['arcs_transfer']
 N_cond = len(df_arc) + len(df_arc_transfer)
 # last GPU will get any extra conductors
 N_cond_per_GPU = ceil(N_cond / 4)

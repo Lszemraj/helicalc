@@ -277,7 +277,10 @@ class ArcIntegrator3D(object):
         # initial time
         t0 = time()
         # print info about bus bar
-        i = int(round(self.geom_df['cond N']))
+        try:
+            i = int(round(self.geom_df['cond N']))
+        except:
+            i = self.geom_df['cond N']
         print(f'Arc Bus Bar {i}: grid with {len(df):E} points')
         # add dataframe to object
         self.df = df.copy()
@@ -322,7 +325,10 @@ class ArcIntegrator3D(object):
 
     def save_grid_calc(self, savetype='pkl', savename=f'Bmaps/helicalc_partial/Mau13.DS_region.standard-busbar.cond_N_57_arc_TEST', all_cols=False):
         # determine which columns to save
-        i = int(round(self.geom_df['cond N']))
+        try:
+            i = int(round(self.geom_df['cond N']))
+        except:
+            i = self.geom_df['cond N']
         cols = ['X', 'Y', 'Z']
         for col in self.df.columns:
             if all_cols:

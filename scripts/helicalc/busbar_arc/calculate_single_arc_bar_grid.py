@@ -15,7 +15,9 @@ from helicalc.solenoid_geom_funcs import load_all_geoms
 datadir = helicalc_data+'Bmaps/helicalc_partial/'
 
 # load straight bus bars, dump all other geometries
-_, _, df_arc, df_arc_transfer = load_all_geoms(return_dict=False)
+df_dict = load_all_geoms(return_dict=True)
+df_arc = df_dict['arcs']
+df_arc_transfer = df_dict['arcs_transfer']
 
 # assume same chunk size for everything, for now
 # N_per_chunk = 2000 # issues for splice boxes
