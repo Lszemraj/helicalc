@@ -1,20 +1,22 @@
 import subprocess
 import argparse
-from helicalc.constants import dxyz_straight_bar_dict, TSd_grid, DS_grid
+from math import ceil
+from helicalc.constants import dxyz_arc_bar_dict, TSd_grid, DS_grid
 from helicalc.solenoid_geom_funcs import load_all_geoms
 
 # load straight bus bars, dump all other geometries
 df_dict = load_all_geoms(return_dict=True)
-df_str = df_dict['straights']
-N_cond = len(df_str)
+df_arc = df_dict['arcs']
+df_arc_transfer = df_dict['arcs_transfer']
+N_cond = len(df_arc) + len(df_arc_transfer)
 # last GPU will get any extra conductors
-N_cond_per_GPU = int(N_cond // 4)
+N_cond_per_GPU = ceil(N_cond / 4)
 
 # evenly split, with remaining bars to GPU 3
-straight_bar_GPU_dict = {0: range(0, N_cond_per_GPU),
-                         1: range(N_cond_per_GPU, 2*N_cond_per_GPU),
-                         2: range(2*N_cond_per_GPU, 3*N_cond_per_GPU),
-                         3: range(3*N_cond_per_GPU, N_cond)}
+arc_bar_GPU_dict = {0: range(0, N_cond_per_GPU),
+                    1: range(N_cond_per_GPU, 2*N_cond_per_GPU),
+                    2: range(2*N_cond_per_GPU, 3*N_cond_per_GPU),
+                    3: range(3*N_cond_per_GPU, N_cond)}
 
 if __name__=='__main__':
     # parse command line arguments
@@ -47,10 +49,13 @@ if __name__=='__main__':
     Test = args.Testing
 
     print(f'Running on GPU: {Dev}')
-    for i in straight_bar_GPU_dict[Dev]:
-        df_cn = df_str.iloc[i]
+    for i in arc_bar_GPU_dict[Dev]:
+        if i < len(df_arc):
+            df_cn = df_arc.iloc[i]
+        else:
+            df_cn = df_arc_transfer.iloc[i-len(df_arc)]
         cn = df_cn['cond N']
         print(f'Calculating {i}: cond N={cn}, info={df_cn["Name/role"]}')
-        _ = subprocess.run(f'python calculate_single_straight_bar_grid.py'+
+        _ = subprocess.run(f'python calculate_single_arc_bar_grid.py'+
                            f' -r {reg} -C {cn} -D {Dev} -t {Test}', shell=True,
                            capture_output=False)

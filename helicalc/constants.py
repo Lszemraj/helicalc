@@ -68,3 +68,7 @@ helicalc_GPU_dict = {0: [{'coil': 56, 'layer': 1, 'name': 'DS-1'}, {'coil': 56, 
 # fine integration grid (3x3 in cross section, 1/(0.5cm) in length)
 dxyz_straight_bar_dict = {1: np.array([1e-3,3e-3, 5e-3]),
                           2: np.array([1e-3,2e-3, 5e-3])}
+## ARC BAR
+# dz (dphi) assumes R=1. Adjust this when using if this is not the case.
+dxyz_arc_bar_dict = {1: np.array([1e-3,3e-3, 5e-3]),
+                     2: np.array([1e-3,2e-3, 5e-3])}

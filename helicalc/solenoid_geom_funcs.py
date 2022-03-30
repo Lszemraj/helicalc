@@ -1,32 +1,37 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation
+from helicalc import helicalc_dir
 
 # Loading dataframes with geometry information
 def load_all_geoms(return_dict=True):
     # files
-    geom_dir = '/home/shared_data/helicalc_params/'
+    geom_dir = helicalc_dir+'dev/params/'
     coils_file = geom_dir + 'Mu2e_Coils_Conductors.pkl'
+    interlayer_file = geom_dir+'Mu2e_V13_coil_interlayer.txt'
     straight_file = geom_dir + 'Mu2e_Straight_Bars_V13.csv'
     arc_file = geom_dir + 'Mu2e_Arc_Bars_V13.csv'
     arc_transfer_file = geom_dir + 'Mu2e_Arc_Transfer_Bars_V13.csv'
     # load dataframes
     df_coils = pd.read_pickle(coils_file)
+    df_interlayer = pd.read_csv(interlayer_file)
     df_str = pd.read_csv(straight_file)
     df_arc = pd.read_csv(arc_file)
     df_arc_tr = pd.read_csv(arc_transfer_file)
     if return_dict:
-        df_dict = {'coils': df_coils, 'straights': df_str, 'arcs': df_arc,
+        df_dict = {'coils': df_coils, 'interlayers': df_interlayer,
+                   'straights': df_str, 'arcs': df_arc,
                    'arcs_transfer': df_arc_tr}
         return df_dict
     else:
-        return df_coils, df_str, df_arc, df_arc_tr
+        return df_coils, df_interlayer, df_str, df_arc, df_arc_tr
 
 # creating other relevant dictionaries
 def make_conductor_dicts(df_dict):
     # dictionary with relevant Monte Carlo generation function
     # based on geometry
     generate_dict = {'coils': gen_helical_coil_allsurface_points,
+                     'interlayers': gen_arc_allsurface_points,
                      'straights': gen_straight_allsurface_points,
                      'arcs': gen_arc_allsurface_points,
                      'arcs_transfer': gen_arc_allsurface_points}
@@ -35,16 +40,22 @@ def make_conductor_dicts(df_dict):
     conductor_dict = {}
     id_column_dict = {}
     for key, df in df_dict.items():
-        if key != 'coils':
+        if key not in ['coils', 'interlayers']:
             for v in df['cond N'].values:
                 conductor_dict[str(v)] = key
                 id_column_dict[str(v)] = 'cond N'
-        else:
+        elif key == 'coils':
             for v in df['Coil_Num'].values:
                 # check if in DS
                 if v>=56:
                     conductor_dict[str(v)+'_c'] = key
                     id_column_dict[str(v)+'_c'] = 'Coil_Num'
+        elif key == 'interlayers':
+            for v in df['cond N'].values:
+                conductor_dict[str(v)+'_il'] = key
+                id_column_dict[str(v)+'_il'] = 'cond N'
+        else:
+            raise ValueError(f'Geometry key "{key}" not recognized.')
 
     return generate_dict, conductor_dict, id_column_dict
 
@@ -700,6 +711,157 @@ def gen_helical_coil_allsurface_points(df, coil_num, conductor_end='out',
                                             surface_num=k,
                                             use_min_cross=use_min_cross,
                                             N=N_)
+        xs_, ys_, zs_ = _
+        xs.append(xs_)
+        ys.append(ys_)
+        zs.append(zs_)
+    return np.concatenate(xs), np.concatenate(ys), np.concatenate(zs)
+
+# single coil layer (for checking interlayer)
+def gen_helical_coil_layer_surface_points(df, coil_num, conductor_end='out',
+                                          layer=1, surface_num=0,
+                                          use_min_cross=True, N=1000,
+                                          interlayer_connect=True):
+    df_ = df.query(f'Coil_Num == {coil_num}').iloc[0]
+    # get parameters from coil
+    N_turns = int(df_.N_turns)
+    N_layers = int(df_.N_layers)
+    hel = df_.helicity * (-1)**(layer-1)
+    zcen = df_.z
+    L_proper = df_.L
+    w = df_.w_sc # z
+    h = df_.h_sc # radial
+    phi0 = df_.phi0
+    phi1 = df_.phi1
+    # check how to wind
+    if layer != N_layers:
+        phi_start = phi0
+        phi_end = phi0
+    else:
+        phi_start = phi0
+        phi_end = phi1
+    # switch phi0 or phi1 at -z if helicity = -1
+    if hel < 0:
+        hold = phi_start
+        phi_start = phi_end
+        phi_end = hold
+    # how much to subtract in phis
+    dphi = abs(phi_end-phi_start)
+    # full number of turns
+    full_dPHI = (N_turns*(2*np.pi)-dphi)
+    # where are we referencing from? depends on helicity of the layer
+    z_ref = zcen - hel * L_proper / 2
+    # what is z of center at starting phi?
+    if hel < 0:
+        #z_start = z_ref - L_proper + (df_.t_gi + df_.t_ci + df_.w_cable/2)
+        # not entirely certain why this is the prescription
+        z_start = z_ref - L_proper + (df_.t_gi - df_.t_ci + df_.w_cable/2)
+    else:
+        z_start = z_ref + (df_.t_gi + df_.t_ci + df_.w_cable/2)
+    # calculate actual phi range, depending on layer
+    if use_min_cross:
+        mc = np.min([w, h])
+    else:
+        mc = np.max([w, h])
+    # R, dphi
+    Rcen = df_.rho0_a + (layer-1)*(df_.h_cable + 2*df_.t_ci + df_.t_il)\
+           + df_.h_sc/2
+    #PHI = np.radians(df_.dphi)
+    dPHI = mc/Rcen
+    # check where 0 face is, and get phi range
+    phi_range = np.array([phi_start, phi_start + hel*full_dPHI])
+    # check whether to shorten range for interlayer connect
+    if layer != N_layers:
+        if interlayer_connect:
+            if hel < 0:
+                # connect brick at phi_start
+                phi_range[0] = phi_range[0] - np.radians(36.)
+            else:
+                # connect brick at phi_end
+                phi_range[1] = phi_range[1] - np.radians(36.)
+    if conductor_end=='in':
+        phi_face0 = np.min(phi_range)
+        phi_empty = phi_face0 + dPHI
+    else:
+        phi_face0 = np.max(phi_range)
+        phi_empty = phi_face0 - dPHI
+    # check which surface we are in and generate accordingly
+    # start in starting frame
+    if surface_num == 0: # end, phi fixed, randomize R and Z
+        phis = phi_face0
+        dZ = np.random.uniform(low=-w/2, high=w/2, size=N)
+        dR = np.random.uniform(low=-h/2, high=h/2, size=N)
+
+    elif (surface_num == 1) or (surface_num == 3): # bottom, top
+        if surface_num == 1: # bottom, dZ const (-w/2)
+            dZ = -w/2
+        else: # top, dZ const (w/2)
+            dZ = w/2
+        dR = np.random.uniform(low=-h/2, high=h/2, size=N)
+        phis = np.random.uniform(low=phi_face0, high=phi_empty, size=N)
+    else: # left, right
+        if surface_num == 2: # left, dR const (-h/2)
+            dR = -h/2
+        else: # top, dZ const (w/2)
+            dR = h/2
+        dZ = np.random.uniform(low=-w/2, high=w/2, size=N)
+        phis = np.random.uniform(low=phi_face0, high=phi_empty, size=N)
+
+    zs = (z_start+dZ) + np.abs(phis-phi_start)/(2*np.pi) * df_.pitch
+    xs = df_.x + (Rcen+dR) * np.cos(phis)
+    ys = df_.y + (Rcen+dR) * np.sin(phis)
+
+    return xs, ys, zs
+
+# same as before
+def gen_helical_coil_layer_allsurface_points(df, coil_num, conductor_end='out',
+                                             layer=1, interlayer_connect=True,
+                                             use_min_cross=True, N=1000,
+                                             N_rel=False):
+    # calculate surface area fraction in each face
+    df_ = df.query(f'Coil_Num == {coil_num}').iloc[0]
+    N_turns = int(df_.N_turns)
+    N_layers = int(df_.N_layers)
+    hel = df_.helicity * (-1)**(layer-1)
+    # w is Z direction, h is R direction
+    w = df_.w_sc
+    h = df_.h_sc
+    # how wide to make the sides?
+    if use_min_cross:
+        mc = np.min([w,h])
+    else:
+        mc = np.max([w,h])
+    # R, dphi
+    Rcen = df_.rho0_a + (layer-1)*(df_.h_cable + 2*df_.t_ci + df_.t_il)\
+           + df_.h_sc/2
+    R = Rcen
+    #PHI = np.radians(df_.dphi)
+    dPHI = mc/R
+    # check if relative number given
+    if N_rel:
+        N = int(round(N * R*dPHI))
+    # note using circular arc areas
+    # may not be perfect, but pretty close
+    areas = {0: w*h, 1: h*R*dPHI, 2: w*R*dPHI, 3: h*R*dPHI, 4: w*R*dPHI}
+    tot_area = np.sum(list(areas.values()))
+    sample_fracs = {k: v/tot_area for k, v in areas.items()}
+    N_faces = {k:int(round(N*v)) for k, v in sample_fracs.items()}
+    N_tot = np.sum(list(N_faces.values()))
+    if N_tot != N:
+        delta_N = N_tot - N
+        N_faces[0] = N_faces[0] - delta_N
+    # loop through faces, and save points
+    xs = []
+    ys = []
+    zs = []
+    for k, N_ in N_faces.items():
+        _ = gen_helical_coil_layer_surface_points(df, coil_num,
+                                                  conductor_end=conductor_end,
+                                                  layer=layer,
+                                                  surface_num=k,
+                                                  use_min_cross=use_min_cross,
+                                                  N=N_,
+                                                  interlayer_connect=interlayer_connect)
         xs_, ys_, zs_ = _
         xs.append(xs_)
         ys.append(ys_)

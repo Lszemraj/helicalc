@@ -69,20 +69,24 @@ def helix_integrand_Bz_min(RX, RY, RZ, R2_32, HRHOCOSPHI, HRHOSINPHI, pitch_bar)
 ####
 
 ## CIRCULAR ARC BAR
-def rx_circ(rho, COSPHI, x):
-    return x - rho*COSPHI
-def ry_circ(rho, SINPHI, y):
-    return y - rho*SINPHI
-# need to check rz...
-def rz_circ(zeta, z):
-    return z - zeta
+# note in OPERA, orientation is with field in -x direction
+# and arc phi0 is at origin, rather than the center of the arc at origin
 
-def circle_integrand_Bx(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
-    return (rho * COSPHI * RZ) / R2_32
-def circle_integrand_By(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
-    return (rho * SINPHI * RZ) / R2_32
-def circle_integrand_Bz(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
-    return (-rho * SINPHI * RY - rho * COSPHI * RX) / R2_32
+def rx_arc(x0, xp):
+    return x0 - xp
+def ry_arc(y0, rho0, RHO, COSPHI):
+    return y0 + RHO*COSPHI - rho0
+def rz_arc(z0, RHO, SINPHI):
+    return z0 - RHO*SINPHI
+
+# kept order so it appears similar to the standard orientation
+def arc_integrand_By(RHO, SINPHI, COSPHI, RX, RY, RZ, R2_32):
+    return RHO*RX*COSPHI/R2_32
+def arc_integrand_Bz(RHO, SINPHI, COSPHI, RX, RY, RZ, R2_32):
+    return -RHO*RX*SINPHI/R2_32
+def arc_integrand_Bx(RHO, SINPHI, COSPHI, RX, RY, RZ, R2_32):
+    return RHO*(RZ*SINPHI - RY*COSPHI)/R2_32
+
 
 ####
 
